@@ -1,0 +1,22 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+
+metadata:
+  name: recording-rules
+  namespace: monitoring
+  labels:
+    release: monitoring
+
+spec:
+  groups:
+
+    - name: recording-rules
+
+      interval: 30s
+
+      rules:
+
+        - record: cluster:pod_count
+
+          expr: |
+            count(kube_pod_info)

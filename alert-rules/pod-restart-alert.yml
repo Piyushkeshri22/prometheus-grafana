@@ -1,0 +1,50 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+
+metadata:
+  name: pod-restart-alert
+  namespace: monitoring
+  labels:
+    release: monitoring
+
+spec:
+  groups:
+    - name: kubernetes-pod-restart-alerts
+
+      rules:
+
+        - alert: KubernetesPodRestartWarning
+
+          expr: |
+            increase(
+              kube_pod_container_status_restarts_total{
+                namespace!~"kube-system|monitoring"
+              }[5m]
+            ) > 1
+
+          for: 2m
+
+          labels:
+            severity: warning
+
+          annotations:
+            summary: "Pod Restart Warning"
+            description: "Pod {{ $labels.pod }} restarted more than once during the last 5 minutes."
+
+        - alert: KubernetesPodRestartCritical
+
+          expr: |
+            increase(
+              kube_pod_container_status_restarts_total{
+                namespace!~"kube-system|monitoring"
+              }[5m]
+            ) > 5
+
+          for: 1m
+
+          labels:
+            severity: critical
+
+          annotations:
+            summary: "Pod Restart Critical"
+            description: "Pod {{ $labels.pod }} restarted more than five times during the last 5 minutes."

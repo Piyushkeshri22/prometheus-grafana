@@ -1,0 +1,32 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+
+metadata:
+  name: oom-killed-alert
+  namespace: monitoring
+
+  labels:
+    release: monitoring
+
+spec:
+  groups:
+    - name: pod-alerts
+
+      rules:
+
+        - alert: KubernetesPodOOMKilled
+
+          expr: |
+            kube_pod_container_status_last_terminated_reason{
+              reason="OOMKilled",
+              namespace!~"kube-system|monitoring"
+            } == 1
+
+          for: 1m
+
+          labels:
+            severity: warning
+
+          annotations:
+            summary: "Pod was OOMKilled"
+            description: "Container {{ $labels.container }} in pod {{ $labels.pod }} was terminated because it exceeded its memory limit."

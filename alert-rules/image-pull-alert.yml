@@ -1,0 +1,23 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: image-pull-alert
+  namespace: monitoring
+  labels:
+    release: monitoring
+
+spec:
+  groups:
+  - name: kubernetes-pod-alerts
+    rules:
+    - alert: KubernetesPodImagePullBackOff
+      expr: |
+        kube_pod_container_status_waiting_reason{
+          reason="ImagePullBackOff"
+        } == 1
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Pod image pull failure"
+        description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} cannot pull its container image."

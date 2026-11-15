@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+
+metadata:
+  name: restart-demo
+  namespace: default
+
+spec:
+  restartPolicy: Always
+
+  containers:
+    - name: restart-container
+      image: busybox
+      command:
+        - sh
+        - -c
+        - |
+          echo "Starting..."
+          sleep 5
+          exit 1

@@ -1,0 +1,58 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+
+metadata:
+  name: disk-high-alert
+  namespace: monitoring
+  labels:
+    release: monitoring
+
+spec:
+  groups:
+    - name: kubernetes-disk-alerts
+
+      rules:
+
+      - alert: KubernetesNodeDiskUsageWarning
+
+        expr: |
+          (
+            (
+              node_filesystem_size_bytes{fstype!~"tmpfs|ramfs"}
+              -
+              node_filesystem_avail_bytes{fstype!~"tmpfs|ramfs"}
+            )
+            /
+            node_filesystem_size_bytes{fstype!~"tmpfs|ramfs"}
+          ) * 100 > 80
+
+        for: 5m
+
+        labels:
+          severity: warning
+
+        annotations:
+          summary: "Disk usage is above 80%"
+          description: "Node {{ $labels.instance }} is using more than 80% of disk."
+
+      - alert: KubernetesNodeDiskUsageCritical
+
+        expr: |
+          (
+            (
+              node_filesystem_size_bytes{fstype!~"tmpfs|ramfs"}
+              -
+              node_filesystem_avail_bytes{fstype!~"tmpfs|ramfs"}
+            )
+            /
+            node_filesystem_size_bytes{fstype!~"tmpfs|ramfs"}
+          ) * 100 > 90
+
+        for: 2m
+
+        labels:
+          severity: critical
+
+        annotations:
+          summary: "Disk usage is above 90%"
+          description: "Node {{ $labels.instance }} is using more than 90% of disk."
