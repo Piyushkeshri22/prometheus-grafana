@@ -1,0 +1,17 @@
+# Temporary files
+*.tmp
+*.log
+
+# Generated Kubernetes / Helm files
+*-rendered.yaml
+current-values.yaml
+values-current.yaml
+dry-run-output.txt
+
+# Secret files
+*.secret.yaml
+*.secret.yml
+
+# OS files
+.DS_Store
+Thumbs.db
